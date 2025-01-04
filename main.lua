@@ -1,7 +1,7 @@
 local mod = RegisterMod("Equity - Improve Curses", 1)
 
 local RECOMMENDED_SHIFT_IDX = 35
-local CURSE_PROBABILITY = 5
+local CURSE_PROBABILITY = 4
 
 local CURSES = {
     LevelCurse.CURSE_OF_DARKNESS,
@@ -19,6 +19,7 @@ mod.random.curses = RNG()
 local function setCustomCurses()
 
     local level = Game():GetLevel()
+    local stage = level:GetStage()
 
     local rg_init = 0
     local rg_end = 0
@@ -29,19 +30,24 @@ local function setCustomCurses()
         level:RemoveCurses(curse)
     end
 
+    Isaac.DebugString("Random Number: " .. tostring(c))
+
     for _, curse in ipairs(CURSES) do
 
         rg_init = rg_end
         rg_end = rg_init + CURSE_PROBABILITY
 
         if rg_init <= c and c < rg_end then
+
+            if curse == LevelCurse.CURSE_OF_LABYRINTH and stage % 2 == 0 then
+                goto continue
+            end
+
             level:AddCurse(curse)
-            Isaac.DebugString("Applied Curse: " .. tostring(curse))
             return
         end
+        ::continue::
     end
-
-    Isaac.DebugString("No Curse Applied")
 
 end
 
